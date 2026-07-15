@@ -21,7 +21,7 @@ SpeedbFlashStorage::SpeedbFlashStorage(const std::string dbName)
     m_db.reset(raw_db);
 }
 
-void SpeedbFlashStorage::Put(const std::string& key, const std::string& value)
+void SpeedbFlashStorage::put(const std::string& key, const std::string& value)
 {
     //check status
     rocksdb::Status status = m_db->Put(rocksdb::WriteOptions(), key, value);
@@ -31,7 +31,7 @@ void SpeedbFlashStorage::Put(const std::string& key, const std::string& value)
     }
 }
 
-std::optional<std::string> SpeedbFlashStorage::Get(const std::string& key)
+std::optional<std::string> SpeedbFlashStorage::get(const std::string& key)
 {
     std::string value;
     rocksdb::Status status = m_db->Get(rocksdb::ReadOptions(), key, &value);
@@ -46,7 +46,7 @@ std::optional<std::string> SpeedbFlashStorage::Get(const std::string& key)
     }
 }
 
-void SpeedbFlashStorage::Delete(const std::string& key)
+void SpeedbFlashStorage::remove(const std::string& key)
 {
     rocksdb::Status status = m_db->Delete(rocksdb::WriteOptions(), key);
 
@@ -56,7 +56,7 @@ void SpeedbFlashStorage::Delete(const std::string& key)
     }
 }
 
-void SpeedbFlashStorage::PrintDB() const
+void SpeedbFlashStorage::print() const
 {
     printf("Data in FLASH/DB \n");
     rocksdb::ReadOptions read_options;

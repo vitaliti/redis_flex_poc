@@ -2,45 +2,46 @@
 
 #include "ram_cache.hpp"
 
-RamCache::RamCache()
+RamCache::RamCache(const int maxRamData)
+    : m_maxRamData{maxRamData}, m_RamDataCounter{0}
 {
-    m_cache.reserve(m_maxRAMdata);
+    m_cache.reserve(m_maxRamData);
 }
 
-void RamCache::Put(const std::string& key, const std::string& value)
+void RamCache::put(const std::string& key, const std::string& value)
 {
     auto [it, inserted] = m_cache.try_emplace(key);
     it->second.value = value;
     if(inserted)
     {
-        m_hotRAMDataCounter++;
+        m_RamDataCounter++;
     }
-    updateKeyHotness(it, inserted);
+    moveToMostRecentlyUsed(it, inserted);
 }
 
-std::optional<std::string> RamCache::Get(const std::string& key)
+std::optional<std::string> RamCache::get(const std::string& key)
 {
     if(isKeyInCache(key))
     {
         auto it = m_cache.find(key);
-        updateKeyHotness(it, false);
+        moveToMostRecentlyUsed(it, false);
         return it->second.value;
     }
     return std::nullopt;
 }
 
-void RamCache::Delete(const std::string& key)
+void RamCache::remove(const std::string& key)
 {
     auto it = m_cache.find(key);
     if (it != m_cache.end()) 
     {
         m_lru.erase(it->second.lruIt);
         m_cache.erase(it);
-        m_hotRAMDataCounter--;
+        m_RamDataCounter--;
     }
 }
 
-void RamCache::PrintCache() const
+void RamCache::print() const
 {
     printf("Data in RAM/CACHE \n");
     for (const auto & [ key, value ] : m_cache) {
@@ -60,11 +61,10 @@ bool RamCache::isKeyInCache(const std::string& key)
 
 bool RamCache::isCacheFull()
 {
-    printf("isCacheFull current:%d max:%d \n",m_hotRAMDataCounter,  m_maxHotRAMData);
-    return (m_hotRAMDataCounter == m_maxHotRAMData);
+    return (m_RamDataCounter == m_maxRamData);
 }
 
-void RamCache::updateKeyHotness(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted)
+void RamCache::moveToMostRecentlyUsed(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted)
 {
     if (!isInserted) {
         m_lru.erase(it->second.lruIt);        
@@ -86,7 +86,7 @@ std::optional<std::pair<std::string, Entry>> RamCache::removeOldestData()
 
     m_lru.pop_front();
     m_cache.erase(it);
-    m_hotRAMDataCounter--;
+    m_RamDataCounter--;
 
     return result;
 }

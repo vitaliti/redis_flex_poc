@@ -10,7 +10,7 @@ include_directories(include)
 
 add_executable(MyApp 
     main.cpp
-    src/db_controller.cpp
+    src/memory_controller.cpp
     src/speedb_flash_storage.cpp
     src/ram_cache.cpp
 )

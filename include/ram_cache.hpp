@@ -2,37 +2,30 @@
 #define ram_cache_hpp
 
 #include "rocksdb/db.h"
-#include "speedb_flash_storage.hpp"
 
 #include <optional>
 #include <string>
-
-struct Entry
-{
-    std::optional<std::string> value;
-    std::list<std::string>::iterator lruIt;
-};
-
-class RamCache
+#include "i_cache.hpp"
+class RamCache : public ICache
 {
 public:
-    RamCache();
-    ~RamCache() {};
+    RamCache(const int maxRamData);
+    ~RamCache() = default;
 
-    void Put(const std::string& key, const std::string& value);
-    std::optional<std::string> Get(const std::string& key);
-    void Delete(const std::string& key);
-    void PrintCache() const;
-    bool isKeyInCache(const std::string& key);
-    bool isCacheFull();
-    void updateKeyHotness(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted);
-    std::optional<std::pair<std::string, Entry>> removeOldestData();
+    void put(const std::string& key, const std::string& value) override;
+    std::optional<std::string> get(const std::string& key) override;
+    void remove(const std::string& key) override;
+    void print() const override;
+
+    bool isKeyInCache(const std::string& key) override;
+    bool isCacheFull() override;
+    std::optional<std::pair<std::string, Entry>> removeOldestData() override;
 private:
+    void moveToMostRecentlyUsed(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted);
     std::unordered_map<std::string, Entry>::iterator getOldestData();
 
-    const int m_maxRAMdata = 10;
-    const int m_maxHotRAMData = 5;
-    int m_hotRAMDataCounter = 0;
+    int m_maxRamData;
+    int m_RamDataCounter;
     std::unordered_map<std::string, Entry> m_cache;
     std::list<std::string> m_lru;
 };

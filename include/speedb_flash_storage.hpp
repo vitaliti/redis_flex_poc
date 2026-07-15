@@ -4,17 +4,17 @@
 #include "rocksdb/db.h"
 #include <optional>
 #include <string>
-
-class SpeedbFlashStorage
+#include "i_key_value_storage.hpp"
+class SpeedbFlashStorage : public IKeyValueStorage
 {
 public:
     SpeedbFlashStorage(const std::string dbName);
-    ~SpeedbFlashStorage() {};
+    ~SpeedbFlashStorage() = default;
 
-    void Put(const std::string& key, const std::string& value);
-    std::optional<std::string> Get(const std::string& key);
-    void Delete(const std::string& key);
-    void PrintDB() const;
+    void put(const std::string& key, const std::string& value) override;
+    std::optional<std::string> get(const std::string& key) override;
+    void remove(const std::string& key) override;
+    void print() const override;
 private:
     std::unique_ptr<rocksdb::DB> m_db;
 };

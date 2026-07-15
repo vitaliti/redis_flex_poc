@@ -3,17 +3,18 @@
 
 #include "rocksdb/db.h"
 
-#include "db_controller.hpp"
+#include "memory_controller.hpp"
 #include "speedb_flash_storage.hpp"
 #include "ram_cache.hpp"
 
 int main()
 {
+    const int maxRamData = 5;
+    RamCache ramCache{maxRamData};
     SpeedbFlashStorage dbStorage("mydb");
-    RamCache ramCache{};
-    DBController db(dbStorage, ramCache);
+    MemoryController mc(dbStorage, ramCache);
     int userChoice = 0;
-    while (true && userChoice != 8)
+    while (userChoice != 8)
     {
         printf("___________________________\n");
         printf("1) Put new Key/Value into Cache/DB \n");
@@ -45,7 +46,7 @@ int main()
                 std::string value;
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 std::getline(std::cin, value);
-                db.Put(key, value);
+                mc.put(key, value);
             }
             else if(userChoice == 2)
             {
@@ -53,7 +54,7 @@ int main()
                 printf("Key:\n");
                 std::string key;
                 std::cin >> key;
-                auto value = db.Get(key);
+                auto value = mc.get(key);
                 if(value)
                 {
                     printf("Value:%s \n", value->c_str());
@@ -69,15 +70,15 @@ int main()
                 printf("Delete data with a key:");
                 std::string key;
                 std::cin >> key;
-                db.Delete(key);
+                mc.remove(key);
             }
             else if(userChoice == 4)
             {
-                db.PrintCache();
+                mc.printCache();
             }
             else if(userChoice == 5)
             {
-                db.PrintDB();
+                mc.printDB();
             }
         }
     }
