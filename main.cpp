@@ -5,11 +5,13 @@
 
 #include "db_controller.hpp"
 #include "speedb_flash_storage.hpp"
+#include "ram_cache.hpp"
 
 int main()
 {
     SpeedbFlashStorage dbStorage("mydb");
-    DBController db(dbStorage);
+    RamCache ramCache{};
+    DBController db(dbStorage, ramCache);
     int userChoice = 0;
     while (true && userChoice != 8)
     {
