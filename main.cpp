@@ -4,13 +4,16 @@
 #include "rocksdb/db.h"
 
 #include "db_controller.hpp"
+#include "speedb_flash_storage.hpp"
 
 int main()
 {
-    DBController db("mydb");
+    SpeedbFlashStorage dbStorage("mydb");
+    DBController db(dbStorage);
     int userChoice = 0;
     while (true && userChoice != 8)
     {
+        printf("___________________________\n");
         printf("1) Put new Key/Value into Cache/DB \n");
         printf("2) Get Data from Cache/DB \n");
         printf("3) Delete a Key/Value from Cache/DB \n");
@@ -19,6 +22,7 @@ int main()
         // printf("6) Save all Cached Key/Values into DB \n");
         // printf("7) Read DB and put it into RAM \n");
         printf("8) EXIT \n");
+        printf("___________________________\n");
         
         std::cin >> userChoice;
         if(!std::cin)

@@ -11,6 +11,7 @@ include_directories(include)
 add_executable(MyApp 
     main.cpp
     src/db_controller.cpp
+    src/speedb_flash_storage.cpp
 )
 
 target_include_directories(MyApp PRIVATE

@@ -2,23 +2,9 @@
 
 #include "db_controller.hpp"
 
-DBController::DBController(const std::string dbName)
+DBController::DBController(SpeedbFlashStorage& flash_db)
+: m_db{flash_db}
 {
-    rocksdb::Options options;
-    options.create_if_missing = true;
-    rocksdb::DB* raw_db = nullptr;
-
-    rocksdb::Status status = rocksdb::DB::Open(
-        options,
-        dbName,
-        &raw_db
-    );
-
-    if (!status.ok()) {
-    throw std::runtime_error(status.ToString());
-    }
-
-    m_db.reset(raw_db);
     m_cache.reserve(m_maxRAMdata);
 }
 
@@ -50,31 +36,20 @@ std::optional<std::string> DBController::Get(const std::string& key)
     }
     else
     {
-        std::string value;
-        rocksdb::Status status = m_db->Get(rocksdb::ReadOptions(), key, &value);
-        if (status.ok()) 
+        std::optional<std::string> value = m_db.Get(key);
+        if (value) 
         {
             //Call Put here
-            Put(key, value);
-            printf(" Taken from DB and put in cache");
+            Put(key, *value);
+            printf("Taken from DB and put in cache");
             return value;
-        }
-        else
-        {
-            printf("StatusError: %s \n", status.ToString().c_str());
-            return std::nullopt;
         }
     }
 }
 
 void DBController::Delete(const std::string& key)
 {
-    rocksdb::Status status = m_db->Delete(rocksdb::WriteOptions(), key);
-
-    if (!status.ok()) 
-    {
-        printf("StatusError: %s \n", status.ToString().c_str());
-    }
+    m_db.Delete(key);
 
     auto it = m_cache.find(key);
     if (it != m_cache.end()) 
@@ -83,22 +58,6 @@ void DBController::Delete(const std::string& key)
         m_cache.erase(it);
         m_hotRAMDataCounter--;
     }
-}
-
-void DBController::PrintDB() const
-{
-    printf("Data in FLASH/DB \n");
-    rocksdb::ReadOptions read_options;
-    std::unique_ptr<rocksdb::Iterator> it(m_db->NewIterator(read_options));
-
-    for (it->SeekToFirst(); it->Valid(); it->Next()) {
-        printf("Key:%s Value:%s \n", it->key().ToString().c_str(), it->value().ToString().c_str());
-    }
-
-    if (!it->status().ok()) {
-        throw std::runtime_error(it->status().ToString());
-    }
-    printf("___________________________\n");  
 }
 
 void DBController::PrintCache() const
@@ -112,7 +71,11 @@ void DBController::PrintCache() const
         }
         printf("\n");
     }
-    printf("___________________________\n");
+}
+
+void DBController::PrintDB() const
+{
+    m_db.PrintDB();
 }
 
 bool DBController::isKeyInCache(const std::string& key)
@@ -135,7 +98,7 @@ void DBController::removeOldestData()
     std::string coldestKey = m_lru.front();
     auto it = m_cache.find(coldestKey);
     if (it != m_cache.end()) {
-        m_db->Put(rocksdb::WriteOptions(), coldestKey, *it->second.value);
+        m_db.Put(coldestKey, *it->second.value);
         m_lru.pop_front();
         m_cache.erase(it);
     }

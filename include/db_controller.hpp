@@ -2,6 +2,8 @@
 #define db_controller_hpp
 
 #include "rocksdb/db.h"
+#include "speedb_flash_storage.hpp"
+
 #include <optional>
 #include <string>
 
@@ -14,7 +16,7 @@ struct Entry
 class DBController
 {
 public:
-    DBController(const std::string dbName);
+    DBController(SpeedbFlashStorage& flash_db);
     ~DBController() {};
 
     void Put(const std::string& key, const std::string& value);
@@ -28,7 +30,7 @@ private:
     void updateKeyHotness(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted);
     void removeOldestData();
 
-    std::unique_ptr<rocksdb::DB> m_db;
+    SpeedbFlashStorage& m_db;
     const int m_maxRAMdata = 10;
     const int m_maxHotRAMData = 5;
     int m_hotRAMDataCounter = 0;
