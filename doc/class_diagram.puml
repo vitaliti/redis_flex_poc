@@ -10,8 +10,13 @@ interface IKeyValueStorage {
 interface ICache {
     +isKeyInCache(const std::string& key) : bool
     +isCacheFull() : bool
-    +removeOldestData() : std::optional<std::pair<std::string, Entry>>
+    +removeOldestData() : std::optional<KeyValuePair>
 }
+
+note right of ICache
+using KeyValuePair =
+    std::pair<std::string, std::string>
+end note
 
 class RamCache {
     -moveToMostRecentlyUsed(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) : void

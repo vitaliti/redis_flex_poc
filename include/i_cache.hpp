@@ -7,11 +7,7 @@
 #include <string>
 #include <list>
 
-struct Entry
-{
-    std::optional<std::string> value;
-    std::list<std::string>::iterator lruIt;
-};
+using KeyValuePair = std::pair<std::string, std::string>;
 
 class ICache : public IKeyValueStorage
 {
@@ -20,6 +16,6 @@ public:
 
     virtual bool isKeyInCache(const std::string& key) = 0;
     virtual bool isCacheFull() = 0;
-    virtual std::optional<std::pair<std::string, Entry>> removeOldestData() = 0;
+    virtual std::optional<KeyValuePair> removeOldestData() = 0;
 };
 #endif

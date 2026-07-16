@@ -57,6 +57,6 @@ void MemoryController::transferOldestDataToFlash()
     auto keyValuePair = m_ramCache.removeOldestData();
     if(keyValuePair)
     {
-        m_flashStorage.put(keyValuePair->first, *keyValuePair->second.value);
+        m_flashStorage.put(keyValuePair->first, keyValuePair->second);
     }
 }

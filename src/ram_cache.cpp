@@ -10,10 +10,10 @@ RamCache::RamCache(const int maxRamData)
 
 void RamCache::put(const std::string& key, const std::string& value)
 {
-    auto [it, inserted] = m_cache.try_emplace(key);
-    it->second.value = value;
+    auto [it, inserted] = m_cache.try_emplace(key, value);
     if(inserted)
     {
+        it->second.value = value;
         m_RamDataCounter++;
     }
     moveToMostRecentlyUsed(it, inserted);
@@ -64,7 +64,7 @@ bool RamCache::isCacheFull()
     return (m_RamDataCounter == m_maxRamData);
 }
 
-void RamCache::moveToMostRecentlyUsed(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted)
+void RamCache::moveToMostRecentlyUsed(std::unordered_map<std::string, RamCache::Entry>::iterator it, const bool isInserted)
 {
     if (!isInserted) {
         m_lru.erase(it->second.lruIt);        
@@ -74,7 +74,7 @@ void RamCache::moveToMostRecentlyUsed(std::unordered_map<std::string, Entry>::it
     it->second.lruIt = std::prev(m_lru.end());
 }
 
-std::optional<std::pair<std::string, Entry>> RamCache::removeOldestData()
+std::optional<KeyValuePair> RamCache::removeOldestData()
 {
     if (m_lru.empty())
     {
@@ -88,10 +88,10 @@ std::optional<std::pair<std::string, Entry>> RamCache::removeOldestData()
     m_cache.erase(it);
     m_RamDataCounter--;
 
-    return result;
+    return std::make_pair(result.first, *result.second.value);
 }
 
-std::unordered_map<std::string, Entry>::iterator RamCache::getOldestData()
+std::unordered_map<std::string, RamCache::Entry>::iterator RamCache::getOldestData()
 {
     return m_cache.find(m_lru.front());
 }

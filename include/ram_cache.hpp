@@ -20,8 +20,19 @@ public:
 
     bool isKeyInCache(const std::string& key) override;
     bool isCacheFull() override;
-    std::optional<std::pair<std::string, Entry>> removeOldestData() override;
+    std::optional<KeyValuePair> removeOldestData() override;
 private:
+    struct Entry
+    {
+        Entry(std::string value)
+            : value(std::move(value))
+        {
+        }
+
+        std::optional<std::string> value;
+        std::list<std::string>::iterator lruIt;
+    };
+
     void moveToMostRecentlyUsed(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted);
     std::unordered_map<std::string, Entry>::iterator getOldestData();
 
