@@ -85,13 +85,13 @@ std::optional<KeyValuePair> RamCache::removeOldestData()
     }
 
     auto it = getOldestData();
-    auto result = *it;
+    KeyValuePair result{it->first, *it->second.value};
 
     m_lru.pop_front();
     m_cache.erase(it);
     m_RamDataCounter--;
 
-    return std::make_pair(result.first, *result.second.value);
+    return result;
 }
 
 std::unordered_map<std::string, RamCache::Entry>::iterator RamCache::getOldestData()
