@@ -1,0 +1,28 @@
+@startuml Redis POC
+
+interface IKeyValueStorage {
+    +put(const std::string& key, const std::string& value) : void
+    +get(const std::string& key) : std::optional<std::string>
+    +remove(const std::string& key) : void
+    +print() : void
+}
+
+interface ICache {
+    +isKeyInCache(const std::string& key) : bool
+    +isCacheFull() : bool
+    +removeOldestData() : std::optional<std::pair<std::string, Entry>>
+}
+
+class RamCache {
+    -moveToMostRecentlyUsed(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) : void
+    -getOldestData() : std::unordered_map<std::string, Entry>::iterator
+}
+
+class SpeedbFlashStorage {
+}
+
+ICache -u--|> IKeyValueStorage
+SpeedbFlashStorage -u..|> IKeyValueStorage
+RamCache -u..|> ICache
+
+@enduml
