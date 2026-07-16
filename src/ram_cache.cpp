@@ -13,8 +13,11 @@ void RamCache::put(const std::string& key, const std::string& value)
     auto [it, inserted] = m_cache.try_emplace(key, value);
     if(inserted)
     {
-        it->second.value = value;
         m_RamDataCounter++;
+    }
+    else
+    {
+        it->second.value = value;
     }
     moveToMostRecentlyUsed(it, inserted);
 }
