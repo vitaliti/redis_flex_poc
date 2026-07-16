@@ -1,11 +1,12 @@
 #ifndef ram_cache_hpp
 #define ram_cache_hpp
 
+#include "i_cache.hpp"
+
 #include "rocksdb/db.h"
 
 #include <optional>
 #include <string>
-#include "i_cache.hpp"
 class RamCache : public ICache
 {
 public:

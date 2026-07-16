@@ -1,10 +1,13 @@
 #ifndef speedb_flash_storage_hpp
 #define speedb_flash_storage_hpp
 
+#include "i_key_value_storage.hpp"
+
 #include "rocksdb/db.h"
+
 #include <optional>
 #include <string>
-#include "i_key_value_storage.hpp"
+
 class SpeedbFlashStorage : public IKeyValueStorage
 {
 public:

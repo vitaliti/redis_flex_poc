@@ -1,11 +1,11 @@
-#include <iostream>
-#include <unordered_map>
-
-#include "rocksdb/db.h"
-
 #include "memory_controller.hpp"
 #include "speedb_flash_storage.hpp"
 #include "ram_cache.hpp"
+
+#include "rocksdb/db.h"
+
+#include <iostream>
+#include <unordered_map>
 
 int main()
 {

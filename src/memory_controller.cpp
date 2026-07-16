@@ -1,6 +1,6 @@
-#include <rocksdb/iterator.h>
-
 #include "memory_controller.hpp"
+
+#include <rocksdb/iterator.h>
 
 MemoryController::MemoryController(IKeyValueStorage& flashStorage, ICache& ramCache)
     : m_flashStorage{flashStorage}, m_ramCache{ramCache}

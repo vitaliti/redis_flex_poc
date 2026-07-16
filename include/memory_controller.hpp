@@ -1,9 +1,10 @@
 #ifndef memory_controller_hpp
 #define memory_controller_hpp
 
-#include "rocksdb/db.h"
 #include "speedb_flash_storage.hpp"
 #include "ram_cache.hpp"
+
+#include "rocksdb/db.h"
 
 #include <optional>
 #include <string>

@@ -1,6 +1,6 @@
-#include <rocksdb/iterator.h>
-
 #include "speedb_flash_storage.hpp"
+
+#include <rocksdb/iterator.h>
 
 SpeedbFlashStorage::SpeedbFlashStorage(const std::string dbName)
 {

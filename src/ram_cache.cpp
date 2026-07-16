@@ -1,6 +1,6 @@
-#include <rocksdb/iterator.h>
-
 #include "ram_cache.hpp"
+
+#include <rocksdb/iterator.h>
 
 RamCache::RamCache(const int maxRamData)
     : m_maxRamData{maxRamData}, m_RamDataCounter{0}
