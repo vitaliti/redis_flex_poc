@@ -2,6 +2,8 @@
 #define ram_cache_hpp
 
 #include "i_cache.hpp"
+#include "entry.hpp"
+#include "i_eviction_policy.hpp"
 
 #include "rocksdb/db.h"
 
@@ -10,7 +12,7 @@
 class RamCache : public ICache
 {
 public:
-    RamCache(const int maxRamData);
+    RamCache(IEvictionPolicy& evictionPolicy, const int maxRamData);
     ~RamCache() = default;
 
     void put(const std::string& key, const std::string& value) override;
@@ -20,25 +22,11 @@ public:
 
     bool isKeyInCache(const std::string& key) override;
     bool isCacheFull() override;
-    std::optional<KeyValuePair> removeOldestData() override;
+    std::optional<KeyValuePair> getEvictionCandidate() override;
 private:
-    struct Entry
-    {
-        Entry(std::string value)
-            : value(std::move(value))
-        {
-        }
-
-        std::optional<std::string> value;
-        std::list<std::string>::iterator lruIt;
-    };
-
-    void moveToMostRecentlyUsed(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted);
-    std::unordered_map<std::string, Entry>::iterator getOldestData();
-
+    IEvictionPolicy& m_evictionPolicy;
     int m_maxRamData;
     int m_RamDataCounter;
     std::unordered_map<std::string, Entry> m_cache;
-    std::list<std::string> m_lru;
 };
 #endif

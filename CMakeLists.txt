@@ -13,6 +13,7 @@ add_executable(MyApp
     src/memory_controller.cpp
     src/speedb_flash_storage.cpp
     src/ram_cache.cpp
+    src/lru_eviction_policy.cpp
 )
 
 target_include_directories(MyApp PRIVATE

@@ -54,9 +54,11 @@ void MemoryController::printDB() const
 
 void MemoryController::transferOldestDataToFlash()
 {
-    auto keyValuePair = m_ramCache.removeOldestData();
+
+    auto keyValuePair = m_ramCache.getEvictionCandidate();
     if(keyValuePair)
     {
+        m_ramCache.remove(keyValuePair->first);
         m_flashStorage.put(keyValuePair->first, keyValuePair->second);
     }
 }

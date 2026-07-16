@@ -16,6 +16,6 @@ public:
 
     virtual bool isKeyInCache(const std::string& key) = 0;
     virtual bool isCacheFull() = 0;
-    virtual std::optional<KeyValuePair> removeOldestData() = 0;
+    virtual std::optional<KeyValuePair> getEvictionCandidate() = 0;
 };
 #endif

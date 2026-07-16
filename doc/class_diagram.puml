@@ -10,7 +10,7 @@ interface IKeyValueStorage {
 interface ICache {
     +isKeyInCache(const std::string& key) : bool
     +isCacheFull() : bool
-    +removeOldestData() : std::optional<KeyValuePair>
+    +getEvictionCandidate() : std::optional<KeyValuePair>
 }
 
 note right of ICache
@@ -18,16 +18,35 @@ using KeyValuePair =
     std::pair<std::string, std::string>
 end note
 
+class Entry <<struct>> {
+    +value : std::optional<std::string>
+    +lruIt : std::list<std::string>::iterator
+}
+
 class RamCache {
-    -moveToMostRecentlyUsed(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) : void
-    -getOldestData() : std::unordered_map<std::string, Entry>::iterator
+    -updateEvictionCandidate(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) : void
 }
 
 class SpeedbFlashStorage {
 }
 
+interface IEvictionPolicy {
+    +getEvictionCandidate() : std::optional<std::string>
+    +remove(std::unordered_map<std::string, Entry>::iterator it) : void
+    +void updateEvictionCandidate(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) : void
+    +void print() const : void
+}
+
+class LruEvictionPolicy {
+}
+
+LruEvictionPolicy -u..|> IEvictionPolicy
+TODO -u..|> IEvictionPolicy
+
+
 ICache -u--|> IKeyValueStorage
 SpeedbFlashStorage -u..|> IKeyValueStorage
 RamCache -u..|> ICache
+RamCache --> "1" IEvictionPolicy
 
 @enduml

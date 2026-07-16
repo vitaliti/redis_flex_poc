@@ -1,6 +1,7 @@
 #include "memory_controller.hpp"
 #include "speedb_flash_storage.hpp"
 #include "ram_cache.hpp"
+#include "lru_eviction_policy.hpp"
 
 #include "rocksdb/db.h"
 
@@ -9,8 +10,9 @@
 
 int main()
 {
+    LruEvictionPolicy lruPolicy{};
     const int maxRamData = 5;
-    RamCache ramCache{maxRamData};
+    RamCache ramCache{lruPolicy, maxRamData};
     SpeedbFlashStorage dbStorage("mydb");
     MemoryController mc(dbStorage, ramCache);
     int userChoice = 0;
