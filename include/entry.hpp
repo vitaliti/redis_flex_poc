@@ -19,11 +19,12 @@ struct Entry
     // - coupling between Entry and all future algorithms
     // - not used metadata depending on the algo used
 
-    // Used by LRU eviction policy
+    // LRU
     std::list<std::string>::iterator lruIt;
 
     // LFU
-    // uint32_t frequency = 0;
+    uint32_t frequency{0};
+    std::list<std::string>::iterator lfuIt;
 };
 
 #endif

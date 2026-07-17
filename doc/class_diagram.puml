@@ -41,7 +41,7 @@ class LruEvictionPolicy {
 }
 
 LruEvictionPolicy -u..|> IEvictionPolicy
-TODO -u..|> IEvictionPolicy
+LfuEvictionPolicy -u..|> IEvictionPolicy
 
 
 ICache -u--|> IKeyValueStorage

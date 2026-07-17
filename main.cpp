@@ -2,6 +2,7 @@
 #include "speedb_flash_storage.hpp"
 #include "ram_cache.hpp"
 #include "lru_eviction_policy.hpp"
+#include "lfu_eviction_policy.hpp"
 
 #include "rocksdb/db.h"
 
@@ -10,6 +11,7 @@
 
 int main()
 {
+    // LfuEvictionPolicy lfuPolicy{};
     LruEvictionPolicy lruPolicy{};
     const int maxRamData = 5;
     RamCache ramCache{lruPolicy, maxRamData};
