@@ -3,8 +3,6 @@
 
 #include "i_eviction_policy.hpp"
 
-#include "rocksdb/db.h"
-
 #include <optional>
 #include <string>
 

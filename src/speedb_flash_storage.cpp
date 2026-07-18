@@ -1,7 +1,5 @@
 #include "speedb_flash_storage.hpp"
 
-#include <rocksdb/iterator.h>
-
 SpeedbFlashStorage::SpeedbFlashStorage(const std::string dbName)
 {
     rocksdb::Options options;
@@ -23,7 +21,6 @@ SpeedbFlashStorage::SpeedbFlashStorage(const std::string dbName)
 
 void SpeedbFlashStorage::put(const std::string& key, const std::string& value)
 {
-    //check status
     rocksdb::Status status = m_db->Put(rocksdb::WriteOptions(), key, value);
     if (!status.ok()) 
     {

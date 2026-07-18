@@ -12,16 +12,16 @@ void LruEvictionPolicy::print() const
 void LruEvictionPolicy::updateEvictionCandidate(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted)
 {
     if (!isInserted) {
-        m_lru.erase(it->second.lruIt);        
+        m_lru.erase(it->second.m_lruIt);        
     }
 
     m_lru.push_back(it->first);
-    it->second.lruIt = std::prev(m_lru.end());
+    it->second.m_lruIt = std::prev(m_lru.end());
 }
 
 void LruEvictionPolicy::remove(std::unordered_map<std::string, Entry>::iterator it)
 {
-    m_lru.erase(it->second.lruIt);
+    m_lru.erase(it->second.m_lruIt);
 }
 
 std::optional<std::string> LruEvictionPolicy::getEvictionCandidate()

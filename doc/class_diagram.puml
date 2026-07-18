@@ -19,8 +19,19 @@ using KeyValuePair =
 end note
 
 class Entry <<struct>> {
-    +value : std::optional<std::string>
-    +lruIt : std::list<std::string>::iterator
+    +m_value : std::optional<std::string>
+    +m_lruIt : std::list<std::string>::iterator
+    +m_frequency : uint32_t
+    +m_lfuIt : std::list<std::string>::iterator
+}
+
+class MemoryController {
+    +put(const std::string& key, const std::string& value) : void
+    +get(const std::string& key) : std::optional<std::string>
+    +remove(const std::string& key) : void
+    +printDB() : const void
+    +printCache() : const void:
+    -transferOldestDataToFlash() : void
 }
 
 class RamCache {
@@ -43,10 +54,14 @@ class LruEvictionPolicy {
 LruEvictionPolicy -u..|> IEvictionPolicy
 LfuEvictionPolicy -u..|> IEvictionPolicy
 
-
+MemoryController -u-> IKeyValueStorage
+MemoryController -u-> ICache
 ICache -u--|> IKeyValueStorage
 SpeedbFlashStorage -u..|> IKeyValueStorage
 RamCache -u..|> ICache
-RamCache --> "1" IEvictionPolicy
+RamCache -u-> "1" IEvictionPolicy
+RamCache *--> Entry
+
+IEvictionPolicy -d-> Entry
 
 @enduml

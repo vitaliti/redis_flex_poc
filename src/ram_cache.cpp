@@ -17,7 +17,7 @@ void RamCache::put(const std::string& key, const std::string& value)
     }
     else
     {
-        it->second.value = value;
+        it->second.m_value = value;
     }
     m_evictionPolicy.updateEvictionCandidate(it, inserted);
 }
@@ -28,7 +28,7 @@ std::optional<std::string> RamCache::get(const std::string& key)
     {
         auto it = m_cache.find(key);
         m_evictionPolicy.updateEvictionCandidate(it, false);
-        return it->second.value;
+        return it->second.m_value;
     }
     return std::nullopt;
 }
@@ -65,7 +65,7 @@ std::optional<KeyValuePair> RamCache::getEvictionCandidate()
     if(key)
     {
         auto it = m_cache.find(*key);
-        KeyValuePair result{it->first, *it->second.value};
+        KeyValuePair result{it->first, *it->second.m_value};
 
         return result;
     }

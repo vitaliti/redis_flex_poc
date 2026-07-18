@@ -4,20 +4,33 @@
 #include "lru_eviction_policy.hpp"
 #include "lfu_eviction_policy.hpp"
 
-#include "rocksdb/db.h"
-
 #include <iostream>
 #include <unordered_map>
 
 int main()
 {
-    // LfuEvictionPolicy lfuPolicy{};
-    LruEvictionPolicy lruPolicy{};
+    printf("___________________________\n");
+    printf("1) Press 1 for LRU anything else for LFU \n");
+    printf("___________________________\n");
+    int userChoice = 0;
+    std::cin >> userChoice;
+    std::unique_ptr<IEvictionPolicy> policy;
+    if(userChoice == 1)
+    {
+        policy = std::make_unique<LruEvictionPolicy>();
+        printf("LRU shall be used \n");
+    }
+    else
+    {
+        policy = std::make_unique<LfuEvictionPolicy>();
+        printf("LFU shall be used \n");
+    }
+
     const int maxRamData = 5;
-    RamCache ramCache{lruPolicy, maxRamData};
+    RamCache ramCache{*policy, maxRamData};
     SpeedbFlashStorage dbStorage("mydb");
     MemoryController mc(dbStorage, ramCache);
-    int userChoice = 0;
+    
     while (userChoice != 8)
     {
         printf("___________________________\n");
@@ -54,8 +67,8 @@ int main()
             }
             else if(userChoice == 2)
             {
-                printf("Get data from a key:");
-                printf("Key:\n");
+                printf("Get data from a key:\n");
+                printf("Key:");
                 std::string key;
                 std::cin >> key;
                 auto value = mc.get(key);
@@ -65,7 +78,7 @@ int main()
                 }
                 else
                 {
-                    printf("NO SUCH DATA! \n");
+                    printf("\n NO SUCH DATA! \n");
                 }
                 
             }

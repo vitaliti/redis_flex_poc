@@ -1,7 +1,5 @@
 #include "memory_controller.hpp"
 
-#include <rocksdb/iterator.h>
-
 MemoryController::MemoryController(IKeyValueStorage& flashStorage, ICache& ramCache)
     : m_flashStorage{flashStorage}, m_ramCache{ramCache}
 {
@@ -29,7 +27,7 @@ std::optional<std::string> MemoryController::get(const std::string& key)
         if (value) 
         {
             put(key, *value);
-            printf("Taken from DB and put in cache");
+            printf("Taken from DB and put in cache \n");
             return value;
         }
     }
