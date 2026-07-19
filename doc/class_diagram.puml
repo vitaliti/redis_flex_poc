@@ -1,4 +1,5 @@
 @startuml Redis POC
+hide empty members
 
 interface IKeyValueStorage {
     +put(const std::string& key, const std::string& value) : void
@@ -44,8 +45,8 @@ class SpeedbFlashStorage {
 interface IEvictionPolicy {
     +getEvictionCandidate() : std::optional<std::string>
     +remove(std::unordered_map<std::string, Entry>::iterator it) : void
-    +void updateEvictionCandidate(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) : void
-    +void print() const : void
+    +updateEvictionCandidate(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) : void
+    +print() const : void
 }
 
 class LruEvictionPolicy {
@@ -59,9 +60,9 @@ MemoryController -u-> ICache
 ICache -u--|> IKeyValueStorage
 SpeedbFlashStorage -u..|> IKeyValueStorage
 RamCache -u..|> ICache
-RamCache -u-> "1" IEvictionPolicy
+RamCache -r-> "1" IEvictionPolicy
 RamCache *--> Entry
 
-IEvictionPolicy -d-> Entry
+IEvictionPolicy .d.> Entry
 
 @enduml
