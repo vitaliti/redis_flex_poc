@@ -1,11 +1,9 @@
 #include "ram_cache.hpp"
+#include <cinttypes>
 
-#include <rocksdb/iterator.h>
-
-RamCache::RamCache(IEvictionPolicy& evictionPolicy, const int maxRamData)
-    : m_evictionPolicy{evictionPolicy}, m_maxRamData{maxRamData}, m_RamDataCounter{0}
+RamCache::RamCache(IEvictionPolicy& evictionPolicy)
+    : m_evictionPolicy{evictionPolicy}, m_freeRamInBytes{500}, m_maxRamInBytes{500}
 {
-    m_cache.reserve(m_maxRamData);
 }
 
 void RamCache::put(const std::string& key, const std::string& value)
@@ -13,21 +11,29 @@ void RamCache::put(const std::string& key, const std::string& value)
     auto [it, inserted] = m_cache.try_emplace(key, value);
     if(inserted)
     {
-        m_RamDataCounter++;
+        int64_t keySize = key.size() + sizeof(std::string);
+        int64_t entrySize = value.size() + sizeof(Entry);
+        m_freeRamInBytes = m_freeRamInBytes - (keySize + entrySize);
+        printf("Free Memory:%lld Added:%lld \n", m_freeRamInBytes, (keySize + entrySize));
     }
     else
     {
+        int64_t newValueSize = value.size();
+        int64_t oldValueSize =  it->second.m_value->size();
+        m_freeRamInBytes = m_freeRamInBytes - (newValueSize - oldValueSize);
         it->second.m_value = value;
+        printf("Free Memory:%lld Added:%lld \n", m_freeRamInBytes, (newValueSize - oldValueSize));
     }
     m_evictionPolicy.updateEvictionCandidate(it, inserted);
 }
 
 std::optional<std::string> RamCache::get(const std::string& key)
 {
-    if(isKeyInCache(key))
+    auto it = m_cache.find(key);
+    if(it != m_cache.end())
     {
-        auto it = m_cache.find(key);
         m_evictionPolicy.updateEvictionCandidate(it, false);
+        printf("Free Memory:%lld Item:%lld \n", m_freeRamInBytes, (int64_t)(it->second.getSize() + it->first.size() + sizeof(std::string)));
         return it->second.m_value;
     }
     return std::nullopt;
@@ -38,25 +44,38 @@ void RamCache::remove(const std::string& key)
     auto it = m_cache.find(key);
     if (it != m_cache.end()) 
     {
+        int64_t keySize = it->first.size() + sizeof(std::string);
+        int64_t entrySize = it->second.getSize();
+        m_freeRamInBytes = m_freeRamInBytes + (keySize + entrySize);
+        printf("Free Memory:%lld Removed:%lld \n", m_freeRamInBytes, (keySize + entrySize));
+
         m_evictionPolicy.remove(it);
         m_cache.erase(it);
-        m_RamDataCounter--;
     }
 }
 
 void RamCache::print() const
 {
+    printf("Free Memory:%lld Max Memory:%lld \n", m_freeRamInBytes, m_maxRamInBytes);
     m_evictionPolicy.print();
 }
 
-bool RamCache::isKeyInCache(const std::string& key)
+bool RamCache::isWithinMaxCapacity(const std::string& key, const std::string& value)
 {
-    return m_cache.find(key) != m_cache.end();
+    int64_t newKeyPairSize = getKeyValuePredictedSizeInCache(key, value);
+    bool result = ((m_maxRamInBytes - newKeyPairSize) >= 0);
+    return result;
+}
+bool RamCache::hasCapacityFor(const std::string& key, const std::string& value)
+{
+    int64_t newKeyPairSize = getKeyValuePredictedSizeInCache(key, value);
+    bool result = ((m_freeRamInBytes - newKeyPairSize) >= 0);
+    return result;
 }
 
-bool RamCache::isCacheFull()
+bool RamCache::isEmpty()
 {
-    return (m_RamDataCounter == m_maxRamData);
+    return m_cache.empty();
 }
 
 std::optional<KeyValuePair> RamCache::getEvictionCandidate()
@@ -66,8 +85,28 @@ std::optional<KeyValuePair> RamCache::getEvictionCandidate()
     {
         auto it = m_cache.find(*key);
         KeyValuePair result{it->first, *it->second.m_value};
-
         return result;
     }
     return std::nullopt;
+}
+
+int64_t RamCache::getKeyValuePredictedSizeInCache(const std::string& key, const std::string& value)
+{
+    int64_t result = 0;
+    auto it = m_cache.find(key);
+    if(it != m_cache.end())
+    {
+        int64_t oldValueSize = it->second.m_value ? it->second.m_value->size() : 0;
+        int64_t newValueSize = value.size();
+        int64_t byteDelta = newValueSize - oldValueSize;
+        result = byteDelta;
+    }
+    else
+    {
+        int64_t keySize = key.size() + sizeof(std::string);
+        int64_t entrySize = value.size() + sizeof(Entry);
+        int64_t newKeyPairSize = keySize + entrySize;
+        result = newKeyPairSize;
+    }
+    return result;
 }

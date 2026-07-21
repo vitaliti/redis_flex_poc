@@ -10,7 +10,7 @@
 class RamCache : public ICache
 {
 public:
-    RamCache(IEvictionPolicy& evictionPolicy, const int maxRamData);
+    RamCache(IEvictionPolicy& evictionPolicy);
     ~RamCache() = default;
 
     void put(const std::string& key, const std::string& value) override;
@@ -18,13 +18,16 @@ public:
     void remove(const std::string& key) override;
     void print() const override;
 
-    bool isKeyInCache(const std::string& key) override;
-    bool isCacheFull() override;
+    bool isWithinMaxCapacity(const std::string& key, const std::string& value) override;
+    bool hasCapacityFor(const std::string& key, const std::string& value) override;
+    bool isEmpty() override;
     std::optional<KeyValuePair> getEvictionCandidate() override;
 private:
+    int64_t getKeyValuePredictedSizeInCache(const std::string& key, const std::string& value);
+
     IEvictionPolicy& m_evictionPolicy;
-    int m_maxRamData;
-    int m_RamDataCounter;
+    int64_t m_freeRamInBytes;
+    int64_t m_maxRamInBytes;
     std::unordered_map<std::string, Entry> m_cache;
 };
 #endif

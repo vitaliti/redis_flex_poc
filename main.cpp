@@ -26,8 +26,7 @@ int main()
         printf("LFU shall be used \n");
     }
 
-    const int maxRamData = 5;
-    RamCache ramCache{*policy, maxRamData};
+    RamCache ramCache{*policy};
     SpeedbFlashStorage dbStorage("mydb");
     MemoryController mc(dbStorage, ramCache);
     
@@ -55,7 +54,7 @@ int main()
         {
             if(userChoice == 1)
             {
-                printf("Write a key/data pari:\n");
+                printf("Write a key/data pair:\n");
                 printf("Key:\n");
                 std::string key;
                 std::cin >> key;

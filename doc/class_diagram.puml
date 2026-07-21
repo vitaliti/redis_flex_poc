@@ -9,8 +9,9 @@ interface IKeyValueStorage {
 }
 
 interface ICache {
-    +isKeyInCache(const std::string& key) : bool
-    +isCacheFull() : bool
+    +isWithinMaxCapacity(const std::string& key, const std::string& value) : bool
+    +hasCapacityFor(const std::string& key, const std::string& value) : bool
+    +isEmpty() : bool
     +getEvictionCandidate() : std::optional<KeyValuePair>
 }
 
@@ -20,6 +21,7 @@ using KeyValuePair =
 end note
 
 class Entry <<struct>> {
+    +getSize() const : size_t 
     +m_value : std::optional<std::string>
     +m_lruIt : std::list<std::string>::iterator
     +m_frequency : uint32_t
@@ -36,7 +38,7 @@ class MemoryController {
 }
 
 class RamCache {
-    -updateEvictionCandidate(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) : void
+    -getKeyValuePredictedSizeInCache(const std::string& key, const std::string& value) : int64_t
 }
 
 class SpeedbFlashStorage {

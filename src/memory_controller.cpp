@@ -7,10 +7,17 @@ MemoryController::MemoryController(IKeyValueStorage& flashStorage, ICache& ramCa
 
 void MemoryController::put(const std::string& key, const std::string& value)
 {
-    if(!m_ramCache.isKeyInCache(key) && m_ramCache.isCacheFull())
+    if(!m_ramCache.isWithinMaxCapacity(key,value))
+    {
+        printf("NO ROOM IN CACHE! \n");
+        return;
+    }
+
+    while(!m_ramCache.hasCapacityFor(key, value) && !m_ramCache.isEmpty())
     {
         transferOldestDataToFlash();
     }
+
     m_ramCache.put(key, value);
 }
 
@@ -52,7 +59,6 @@ void MemoryController::printDB() const
 
 void MemoryController::transferOldestDataToFlash()
 {
-
     auto keyValuePair = m_ramCache.getEvictionCandidate();
     if(keyValuePair)
     {
