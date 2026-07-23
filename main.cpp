@@ -6,14 +6,11 @@
 
 #include <iostream>
 #include <unordered_map>
+int GetIntInput(const std::string& prompt);
 
 int main()
-{
-    printf("___________________________\n");
-    printf("1) Press 1 for LRU anything else for LFU \n");
-    printf("___________________________\n");
-    int userChoice = 0;
-    std::cin >> userChoice;
+{    
+    int userChoice = GetIntInput("Press 1 for LRU anything else for LFU \n");
     std::unique_ptr<IEvictionPolicy> policy;
     if(userChoice == 1)
     {
@@ -29,74 +26,88 @@ int main()
     RamCache ramCache{*policy};
     SpeedbFlashStorage dbStorage("mydb");
     MemoryController mc(dbStorage, ramCache);
+
+    std::string menu =
+        "1) Put new Key/value into Cache/DB \n"
+        "2) Get Data from Cache/DB \n"
+        "3) Delete a Key/value from Cache/DB \n"
+        "4) Print Cache \n"
+        "5) Print DB \n"
+        // printf("6) Save all Cached Key/userInputs into DB \n");
+        // printf("7) Read DB and put it into RAM \n");
+        "8) EXIT \n";
     
     while (userChoice != 8)
     {
-        printf("___________________________\n");
-        printf("1) Put new Key/Value into Cache/DB \n");
-        printf("2) Get Data from Cache/DB \n");
-        printf("3) Delete a Key/Value from Cache/DB \n");
-        printf("4) Print values in Cache \n");
-        printf("5) Print values in DB \n");
-        // printf("6) Save all Cached Key/Values into DB \n");
-        // printf("7) Read DB and put it into RAM \n");
-        printf("8) EXIT \n");
-        printf("___________________________\n");
-        
-        std::cin >> userChoice;
-        if(!std::cin)
+        userChoice = GetIntInput(menu);
+        if(userChoice == 1)
         {
-            std::cin.clear();
+            printf("Write a key/data pair:\n");
+            printf("Key:\n");
+            std::string key;
+            std::cin >> key;
+            printf("Data:\n");
+            std::string userInput;
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            printf("Bad Input !!!\n");
+            std::getline(std::cin, userInput);
+            mc.put(key, userInput);
         }
-        else
+        else if(userChoice == 2)
         {
-            if(userChoice == 1)
+            printf("Get data from a key:\n");
+            printf("Key:");
+            std::string key;
+            std::cin >> key;
+            auto value = mc.get(key);
+            if(value)
             {
-                printf("Write a key/data pair:\n");
-                printf("Key:\n");
-                std::string key;
-                std::cin >> key;
-                printf("Data:\n");
-                std::string value;
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::getline(std::cin, value);
-                mc.put(key, value);
+                printf("value:%s \n", value->c_str());
             }
-            else if(userChoice == 2)
+            else
             {
-                printf("Get data from a key:\n");
-                printf("Key:");
-                std::string key;
-                std::cin >> key;
-                auto value = mc.get(key);
-                if(value)
-                {
-                    printf("Value:%s \n", value->c_str());
-                }
-                else
-                {
-                    printf("\n NO SUCH DATA! \n");
-                }
-                
+                printf("\n NO SUCH DATA! \n");
             }
-            else if(userChoice == 3)
-            {
-                printf("Delete data with a key:");
-                std::string key;
-                std::cin >> key;
-                mc.remove(key);
-            }
-            else if(userChoice == 4)
-            {
-                mc.printCache();
-            }
-            else if(userChoice == 5)
-            {
-                mc.printDB();
-            }
+            
+        }
+        else if(userChoice == 3)
+        {
+            printf("Delete data with a key:");
+            std::string key;
+            std::cin >> key;
+            mc.remove(key);
+        }
+        else if(userChoice == 4)
+        {
+            mc.printCache();
+        }
+        else if(userChoice == 5)
+        {
+            mc.printDB();
         }
     }
     return 0;
+}
+
+int GetIntInput(const std::string& prompt)
+{
+    int userInput = 0;
+    while (true)
+    {
+        printf("___________________________\n");
+        printf("%s", prompt.c_str());
+        printf("___________________________\n");
+        std::cin >> userInput;
+
+        if (std::cin)
+        {
+            // Remove anything left on the line
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return userInput;
+        }
+
+        // Bad input
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Bad input!!! Please enter an integer.\n";
+    }
 }
