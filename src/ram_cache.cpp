@@ -1,8 +1,8 @@
 #include "ram_cache.hpp"
 #include <cinttypes>
 
-RamCache::RamCache(IEvictionPolicy& evictionPolicy)
-    : m_evictionPolicy{evictionPolicy}, m_freeRamInBytes{500}, m_maxRamInBytes{500}
+RamCache::RamCache(IEvictionPolicy& evictionPolicy, const uint32_t ramSizeInBytes)
+    : m_evictionPolicy{evictionPolicy}, m_freeRamInBytes{ramSizeInBytes}, m_maxRamInBytes{ramSizeInBytes}
 {
 }
 
@@ -63,14 +63,12 @@ void RamCache::print() const
 bool RamCache::isWithinMaxCapacity(const std::string& key, const std::string& value)
 {
     int64_t newKeyPairSize = getKeyValuePredictedSizeInCache(key, value);
-    bool result = ((m_maxRamInBytes - newKeyPairSize) >= 0);
-    return result;
+    return ((m_maxRamInBytes - newKeyPairSize) >= 0);
 }
 bool RamCache::hasCapacityFor(const std::string& key, const std::string& value)
 {
     int64_t newKeyPairSize = getKeyValuePredictedSizeInCache(key, value);
-    bool result = ((m_freeRamInBytes - newKeyPairSize) >= 0);
-    return result;
+    return ((m_freeRamInBytes - newKeyPairSize) >= 0);
 }
 
 bool RamCache::isEmpty()

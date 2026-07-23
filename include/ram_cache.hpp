@@ -10,7 +10,7 @@
 class RamCache : public ICache
 {
 public:
-    RamCache(IEvictionPolicy& evictionPolicy);
+    RamCache(IEvictionPolicy& evictionPolicy, const uint32_t ramSizeInBytes);
     ~RamCache() = default;
 
     void put(const std::string& key, const std::string& value) override;

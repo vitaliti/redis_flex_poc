@@ -23,7 +23,18 @@ int main()
         printf("LFU shall be used \n");
     }
 
-    RamCache ramCache{*policy};
+    userChoice = GetIntInput("Write RAM size in bytes(default is 500) max is 1000 \n");
+    uint32_t ramSizeInBytes = 500;
+    if(userChoice > 0 && userChoice <= 1000)
+    {
+        ramSizeInBytes = static_cast<uint32_t>(userChoice);
+    }
+    else
+    {
+        printf("Illeageal Choice, 500 bytes will be chosen as RAM! \n");
+    }
+
+    RamCache ramCache{*policy, ramSizeInBytes};
     SpeedbFlashStorage dbStorage("mydb");
     MemoryController mc(dbStorage, ramCache);
 
