@@ -6,10 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SPEEDB_DIR "C:/Users/Administrator/Desktop/Projects/speedb")
 
-include_directories(include)
-
-add_executable(MyApp 
-    main.cpp
+add_library(redis_core
     src/memory_controller.cpp
     src/speedb_flash_storage.cpp
     src/ram_cache.cpp
@@ -17,15 +14,25 @@ add_executable(MyApp
     src/lfu_eviction_policy.cpp
 )
 
-target_include_directories(MyApp PRIVATE
+target_include_directories(redis_core PUBLIC
+    include
     ${SPEEDB_DIR}/include
 )
 
-target_link_libraries(MyApp PRIVATE
+target_link_libraries(redis_core PUBLIC
     ${SPEEDB_DIR}/build/Release/speedb.lib
-)
-
-target_link_libraries(MyApp PRIVATE
     Rpcrt4
     Shlwapi
 )
+
+add_executable(MyApp
+    main.cpp
+)
+
+target_link_libraries(MyApp PRIVATE
+    redis_core
+)
+
+enable_testing()
+
+add_subdirectory(tests)
