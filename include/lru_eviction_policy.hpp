@@ -11,8 +11,8 @@ class LruEvictionPolicy : public IEvictionPolicy
 public:
     ~LruEvictionPolicy() = default;
     std::optional<std::string> getEvictionCandidate() override;
-    void remove(const Entry entry) override;
-    void updateEvictionCandidate(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) override;
+    void remove(const Entry& entry) override;
+    void updateEvictionCandidate(const std::string& key, Entry& entry, const bool isInserted) override;
     void print() const override;
 private:
     std::list<std::string> m_lru;

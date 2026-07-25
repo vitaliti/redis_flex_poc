@@ -46,8 +46,8 @@ class SpeedbFlashStorage {
 
 interface IEvictionPolicy {
     +getEvictionCandidate() : std::optional<std::string>
-    +remove(std::unordered_map<std::string, Entry>::iterator it) : void
-    +updateEvictionCandidate(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted) : void
+    +remove(const Entry& entry) : void
+    +updateEvictionCandidate(const std::string& key, Entry& entry, const bool isInserted) : void
     +print() const : void
 }
 

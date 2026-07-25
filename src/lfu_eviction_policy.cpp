@@ -16,7 +16,7 @@ void LfuEvictionPolicy::print() const
     printf("Min frequency = %u\n", m_minFrequency);
 }
 
-void LfuEvictionPolicy::updateEvictionCandidate(std::unordered_map<std::string, Entry>::iterator it, const bool isInserted)
+void LfuEvictionPolicy::updateEvictionCandidate(const std::string& key, Entry& entry, const bool isInserted)
 {
     if (isInserted) 
     {
@@ -24,16 +24,16 @@ void LfuEvictionPolicy::updateEvictionCandidate(std::unordered_map<std::string, 
     }
     else
     {
-        remove(it->second);
+        remove(entry);
     }
 
-    it->second.m_frequency += 1;
-    auto [bucketIt, inserted] = m_lfu.try_emplace(it->second.m_frequency);
-    bucketIt->second.push_back(it->first);
-    it->second.m_lfuIt = std::prev(bucketIt->second.end());
+    entry.m_frequency += 1;
+    auto [bucketIt, inserted] = m_lfu.try_emplace(entry.m_frequency);
+    bucketIt->second.push_back(key);
+    entry.m_lfuIt = std::prev(bucketIt->second.end());
 }
 
-void LfuEvictionPolicy::remove(const Entry entry)
+void LfuEvictionPolicy::remove(const Entry& entry)
 {
     auto bucketIt = m_lfu.find(entry.m_frequency);
     if(bucketIt != m_lfu.end())

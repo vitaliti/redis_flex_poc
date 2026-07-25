@@ -24,7 +24,7 @@ void RamCache::put(const std::string& key, const std::string& value)
         it->second.m_value = value;
         printf("Free Memory:%lld Added:%lld \n", m_freeRamInBytes, (newValueSize - oldValueSize));
     }
-    m_evictionPolicy.updateEvictionCandidate(it, inserted);
+    m_evictionPolicy.updateEvictionCandidate(it->first, it->second, inserted);
 }
 
 std::optional<std::string> RamCache::get(const std::string& key)
@@ -32,7 +32,7 @@ std::optional<std::string> RamCache::get(const std::string& key)
     auto it = m_cache.find(key);
     if(it != m_cache.end())
     {
-        m_evictionPolicy.updateEvictionCandidate(it, false);
+        m_evictionPolicy.updateEvictionCandidate(it->first, it->second, false);
         printf("Free Memory:%lld Item:%lld \n", m_freeRamInBytes, (int64_t)(it->second.getSize() + it->first.size() + sizeof(std::string)));
         return it->second.m_value;
     }

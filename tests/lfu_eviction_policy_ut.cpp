@@ -22,7 +22,7 @@ TEST_F(LfuEvictionPolicyTest, getOnlyInsertedEvictionCandidate) {
     auto it = map.emplace(expectedResult, Entry{""}).first;
     bool isInserted = true;
 
-    policy.updateEvictionCandidate(it, isInserted);
+    policy.updateEvictionCandidate(it->first, it->second, isInserted);
     auto result = policy.getEvictionCandidate();
     EXPECT_EQ(expectedResult, *result);
 }
@@ -36,12 +36,12 @@ TEST_F(LfuEvictionPolicyTest, getLFUEvictionCandidate) {
     auto it2 = map.emplace(key2, Entry{""}).first;
 
     bool isInserted = true;
-    policy.updateEvictionCandidate(it, isInserted);
-    policy.updateEvictionCandidate(it2, isInserted);
+    policy.updateEvictionCandidate(it->first, it->second, isInserted);
+    policy.updateEvictionCandidate(it2->first, it2->second, isInserted);
 
     isInserted = false;
-    policy.updateEvictionCandidate(it2, isInserted);
-    policy.updateEvictionCandidate(it2, isInserted);
+    policy.updateEvictionCandidate(it2->first, it2->second, isInserted);
+    policy.updateEvictionCandidate(it2->first, it2->second, isInserted);
     auto result = policy.getEvictionCandidate();
     EXPECT_EQ(expectedResultKey1, *result);
 }
