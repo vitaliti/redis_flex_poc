@@ -5,6 +5,7 @@
 
 #include <optional>
 #include <string>
+#include <map>
 
 class LfuEvictionPolicy : public IEvictionPolicy
 {
@@ -15,10 +16,8 @@ public:
     void updateEvictionCandidate(const std::string& key, Entry& entry, const bool isInserted) override;
     void print() const override;
 private:
-    // m_minFrequency is valid only when the cache is full.
-    // When a new key is added the m_minFrequency will become 1
-    // Eviction only happens when cache is full, so this is OK
-    uint32_t  m_minFrequency{0};  
-    std::unordered_map<uint32_t, std::list<std::string>> m_lfu;
+    void LfuEvictionPolicy::updateMinFrequency();
+    uint32_t  m_minFrequency{0};
+    std::map<uint32_t, std::list<std::string>> m_lfu;
 };
 #endif

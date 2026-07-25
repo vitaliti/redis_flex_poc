@@ -52,6 +52,7 @@ interface IEvictionPolicy {
 }
 
 class LruEvictionPolicy {
+    -updateMinFrequency() : void
 }
 
 LruEvictionPolicy -u..|> IEvictionPolicy

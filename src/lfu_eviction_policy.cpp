@@ -31,6 +31,7 @@ void LfuEvictionPolicy::updateEvictionCandidate(const std::string& key, Entry& e
     auto [bucketIt, inserted] = m_lfu.try_emplace(entry.m_frequency);
     bucketIt->second.push_back(key);
     entry.m_lfuIt = std::prev(bucketIt->second.end());
+    updateMinFrequency();
 }
 
 void LfuEvictionPolicy::remove(const Entry& entry)
@@ -45,8 +46,7 @@ void LfuEvictionPolicy::remove(const Entry& entry)
             m_lfu.erase(bucketIt);
             if (removedFrequency == m_minFrequency)
             {
-                //BUG HERE, find nex frequency!!
-                m_minFrequency++;
+                updateMinFrequency();
             }
         }
     }
@@ -62,4 +62,16 @@ std::optional<std::string> LfuEvictionPolicy::getEvictionCandidate()
     }
 
     return std::nullopt;
+}
+
+void LfuEvictionPolicy::updateMinFrequency()
+{
+    if (m_lfu.empty())
+    {
+        m_minFrequency = 0;
+    }
+    else
+    {
+        m_minFrequency = m_lfu.begin()->first;
+    }
 }
