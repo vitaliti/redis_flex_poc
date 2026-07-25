@@ -24,7 +24,7 @@ void LfuEvictionPolicy::updateEvictionCandidate(std::unordered_map<std::string, 
     }
     else
     {
-        remove(it);
+        remove(it->second);
     }
 
     it->second.m_frequency += 1;
@@ -33,18 +33,19 @@ void LfuEvictionPolicy::updateEvictionCandidate(std::unordered_map<std::string, 
     it->second.m_lfuIt = std::prev(bucketIt->second.end());
 }
 
-void LfuEvictionPolicy::remove(std::unordered_map<std::string, Entry>::iterator it)
+void LfuEvictionPolicy::remove(const Entry entry)
 {
-    auto bucketIt = m_lfu.find(it->second.m_frequency);
+    auto bucketIt = m_lfu.find(entry.m_frequency);
     if(bucketIt != m_lfu.end())
     {
-        bucketIt->second.erase(it->second.m_lfuIt);
+        bucketIt->second.erase(entry.m_lfuIt);
         if (bucketIt->second.empty())
         {
-            uint32_t removedFrequency = it->second.m_frequency;
+            uint32_t removedFrequency = entry.m_frequency;
             m_lfu.erase(bucketIt);
             if (removedFrequency == m_minFrequency)
             {
+                //BUG HERE, find nex frequency!!
                 m_minFrequency++;
             }
         }

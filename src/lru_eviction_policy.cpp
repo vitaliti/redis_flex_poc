@@ -19,9 +19,9 @@ void LruEvictionPolicy::updateEvictionCandidate(std::unordered_map<std::string, 
     it->second.m_lruIt = std::prev(m_lru.end());
 }
 
-void LruEvictionPolicy::remove(std::unordered_map<std::string, Entry>::iterator it)
+void LruEvictionPolicy::remove(const Entry entry)
 {
-    m_lru.erase(it->second.m_lruIt);
+    m_lru.erase(entry.m_lruIt);
 }
 
 std::optional<std::string> LruEvictionPolicy::getEvictionCandidate()

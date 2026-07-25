@@ -49,7 +49,7 @@ void RamCache::remove(const std::string& key)
         m_freeRamInBytes = m_freeRamInBytes + (keySize + entrySize);
         printf("Free Memory:%lld Removed:%lld \n", m_freeRamInBytes, (keySize + entrySize));
 
-        m_evictionPolicy.remove(it);
+        m_evictionPolicy.remove(it->second);
         m_cache.erase(it);
     }
 }
