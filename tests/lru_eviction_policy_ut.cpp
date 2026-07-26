@@ -1,21 +1,21 @@
 // #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "lfu_eviction_policy.hpp"
+#include "lru_eviction_policy.hpp"
 
 using namespace testing;
 
-class LfuEvictionPolicyTest : public Test {
+class LruEvictionPolicyTest : public Test {
 protected:
-    LfuEvictionPolicy policy{};
+    LruEvictionPolicy policy{};
 };
 
-TEST_F(LfuEvictionPolicyTest, getEmptyEvictionCandidate) {
+TEST_F(LruEvictionPolicyTest, getEmptyEvictionCandidate) {
     auto result = policy.getEvictionCandidate();
     EXPECT_FALSE(result);
 }
 
-TEST_F(LfuEvictionPolicyTest, getOnlyInsertedEvictionCandidate) {
+TEST_F(LruEvictionPolicyTest, getOnlyInsertedEvictionCandidate) {
     std::unordered_map<std::string, Entry> map;
 
     const std::string key = "testttKEYYY";
@@ -27,7 +27,7 @@ TEST_F(LfuEvictionPolicyTest, getOnlyInsertedEvictionCandidate) {
     EXPECT_EQ(key, *result);
 }
 
-TEST_F(LfuEvictionPolicyTest, getCorrectLFUEvictionCandidate) {
+TEST_F(LruEvictionPolicyTest, getCorrectLRUEvictionCandidate) {
     std::unordered_map<std::string, Entry> map;
 
     const std::string key1 = "KEY1";
@@ -46,7 +46,7 @@ TEST_F(LfuEvictionPolicyTest, getCorrectLFUEvictionCandidate) {
     EXPECT_EQ(key1, *result);
 }
 
-TEST_F(LfuEvictionPolicyTest, removeOnlyEvictionCandidate) {
+TEST_F(LruEvictionPolicyTest, removeOnlyEvictionCandidate) {
     std::unordered_map<std::string, Entry> map;
 
     const std::string key1 = "KEY1";
@@ -61,7 +61,7 @@ TEST_F(LfuEvictionPolicyTest, removeOnlyEvictionCandidate) {
     EXPECT_FALSE(result);
 }
 
-TEST_F(LfuEvictionPolicyTest, removeCorrectLFUEvictionCandidate) {
+TEST_F(LruEvictionPolicyTest, removeCorrectLRUEvictionCandidate) {
     std::unordered_map<std::string, Entry> map;
 
     const std::string key1 = "KEY1";
@@ -80,7 +80,7 @@ TEST_F(LfuEvictionPolicyTest, removeCorrectLFUEvictionCandidate) {
     EXPECT_EQ(key2, *result);
 }
 
-TEST_F(LfuEvictionPolicyTest, callPrintForCoverage) {
+TEST_F(LruEvictionPolicyTest, callPrintForCoverage) {
     std::unordered_map<std::string, Entry> map;
     const std::string key1 = "KEY1";
     auto it = map.emplace(key1, Entry{""}).first;

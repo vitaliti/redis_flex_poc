@@ -18,6 +18,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(UnitTests
     test_main.cpp
     lfu_eviction_policy_ut.cpp
+    lru_eviction_policy_ut.cpp
     # test_memory_controller.cpp
 
     # ../src/ram_cache.cpp
